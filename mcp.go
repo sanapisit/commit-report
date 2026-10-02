@@ -19,7 +19,7 @@ type reportArgs struct {
 
 // รันเป็น MCP server ผ่าน stdio โดยใช้ root/depth จาก flag เป็นค่าเริ่มต้น
 func serveMCP(root string, depth int) error {
-	server := mcp.NewServer(&mcp.Implementation{Name: "commit-report", Version: "0.1.0"}, nil)
+	server := mcp.NewServer(&mcp.Implementation{Name: "commit-report", Version: version}, nil)
 	mcp.AddTool(server, &mcp.Tool{
 		Name:        "commit_report",
 		Description: "สรุป commit ของผู้ใช้จากทุก git repo ใต้ root ในช่วงวันที่กำหนด แยกตามวัน และแยก [ui]/[service]",

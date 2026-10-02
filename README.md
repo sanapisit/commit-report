@@ -12,7 +12,9 @@
 
 ## ติดตั้ง
 
-ต้องใช้ Go 1.25 ขึ้นไป และมี `git` อยู่ใน PATH
+ต้องมี `git` อยู่ใน PATH
+
+ดาวน์โหลด binary ตาม OS ได้จาก [Releases](https://github.com/sanapisit/commit-report/releases) หรือติดตั้งด้วย Go 1.25 ขึ้นไป
 
 ```bash
 go install github.com/sanapisit/commit-report@latest
@@ -68,6 +70,17 @@ claude mcp add commit-report -- commit-report -mcp -root D:/Workspace
 - commit ที่ subject ซ้ำในวันเดียวกัน (เช่น cherry-pick ข้าม branch) แสดงครั้งเดียว
 - `feat(scope): ข้อความ` แสดงเป็น `scope ข้อความ`
 - ค้นหาทุก branch (`--all`) และข้าม `node_modules`
+
+## Release
+
+version อยู่ที่ `const version` ใน `main.go`
+
+เมื่อ PR ถูก merge เข้า `main` GitHub Actions จะอ่าน `const version`
+
+- ถ้ายังไม่มี tag `v<version>` จะรัน test, build binary สำหรับ linux/darwin/windows (amd64, arm64) พร้อม `checksums.txt` แล้วสร้าง tag + release ที่ merge commit
+- ถ้ามี tag นี้อยู่แล้วจะข้าม ดังนั้น PR ที่ไม่ได้แก้ `const version` จะไม่ออก release
+
+อยากออก release ก็แค่ bump `const version` ใน PR นั้น
 
 ## Test
 
