@@ -25,11 +25,7 @@ func main() {
 	md := flag.Bool("md", false, "ครอบแต่ละวันด้วย ``` สำหรับ copy")
 	flag.Parse()
 
-	authors := splitAuthors(*author)
-	if len(authors) == 0 {
-		out, _ := exec.Command("git", "config", "--global", "user.email").Output()
-		authors = splitAuthors(string(out))
-	}
+	authors := resolveAuthors(*author)
 	if len(authors) == 0 {
 		fmt.Fprintln(os.Stderr, "ไม่พบ author ใช้ -author")
 		os.Exit(1)
@@ -37,6 +33,15 @@ func main() {
 
 	r := collect(findRepos(*root, *depth), options{*start, *end, authors})
 	fmt.Print(r.render(*md))
+}
+
+// author ที่ระบุ หรือถ้าไม่ระบุใช้ git config user.email
+func resolveAuthors(s string) []string {
+	if authors := splitAuthors(s); len(authors) > 0 {
+		return authors
+	}
+	out, _ := exec.Command("git", "config", "--global", "user.email").Output()
+	return splitAuthors(string(out))
 }
 
 func splitAuthors(s string) []string {
