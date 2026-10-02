@@ -65,6 +65,16 @@ claude mcp add commit-report -- commit-report -mcp -root D:/Workspace
 
 แล้วถามได้เลย เช่น "สรุป commit ของฉันตั้งแต่ 14 ก.ย." หรือ "เมื่อวานทำอะไรไปบ้าง"
 
+### อัปเดต
+
+ไม่ต้อง `claude mcp add` ใหม่ แค่เปลี่ยน binary
+
+1. ติดตั้งเวอร์ชันใหม่ด้วย `go install github.com/sanapisit/commit-report@latest` หรือดาวน์โหลดจาก [Releases](https://github.com/sanapisit/commit-report/releases) มาทับไฟล์เดิม (บน Windows ต้องปิด Claude Code หรือ disconnect server ใน `/mcp` ก่อน ไม่งั้นทับไฟล์ไม่ได้)
+2. เปิด session ใหม่ หรือ reconnect `commit-report` ใน `/mcp`
+3. เช็กด้วย `commit-report -version` หรือดูเลขเวอร์ชันใน `/mcp`
+
+ต้อง `claude mcp remove commit-report` แล้ว add ใหม่ก็ต่อเมื่อย้ายที่อยู่ binary หรือจะเปลี่ยน flag เช่น `-root`
+
 ## กติกา
 
 - **ui** ถ้าชื่อ repo มี `-ui` หรือมีไฟล์ `angular.json`, `pubspec.yaml`, `index.html` ที่ root ของ repo นอกนั้นเป็น **service**
