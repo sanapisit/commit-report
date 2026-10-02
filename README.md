@@ -29,6 +29,7 @@ go build -o commit-report.exe .
 | ไฟล์ | หน้าที่ |
 |---|---|
 | `main.go` | อ่าน flag และเรียกใช้งาน |
+| `mcp.go` | MCP server และ tool `commit_report` |
 | `git.go` | ค้นหา repo, รัน `git log`, กรองและแปลง commit |
 | `report.go` | จัดกลุ่มตามวัน/ประเภท และ render ผลลัพธ์ |
 
@@ -46,6 +47,19 @@ go build -o commit-report.exe .
 | `-author` | `git config user.email` | email ผู้ commit ใส่หลายคนคั่นด้วย `,` |
 | `-depth` | `4` | ความลึกสูงสุดที่ค้นหา repo |
 | `-md` | `false` | ครอบแต่ละวันด้วย ```` ``` ```` เพื่อให้ copy ง่าย |
+| `-mcp` | `false` | รันเป็น MCP server ผ่าน stdio |
+
+## ใช้เป็น MCP server
+
+ใส่ `-mcp` เพื่อรันเป็น MCP server ผ่าน stdio มี tool `commit_report` รับ `start`, `end`, `author`, `root`, `depth` (ไม่ใส่จะใช้ค่าเริ่มต้นเหมือน CLI โดย `root`/`depth` ใช้ค่าจาก flag ตอนสั่งรัน server)
+
+ลงทะเบียนกับ Claude Code
+
+```bash
+claude mcp add commit-report -- commit-report -mcp -root D:/Workspace
+```
+
+แล้วถามได้เลย เช่น "สรุป commit ของฉันตั้งแต่ 14 ก.ย." หรือ "เมื่อวานทำอะไรไปบ้าง"
 
 ## กติกา
 
