@@ -11,7 +11,7 @@ import (
 )
 
 // bump เลขนี้ใน PR เพื่อออก release ตอน merge เข้า main
-const version = "0.1.0"
+const version = "0.1.1"
 
 type options struct {
 	start, end string
@@ -25,9 +25,27 @@ func main() {
 	end := flag.String("end", today, "วันสิ้นสุด (YYYY-MM-DD)")
 	author := flag.String("author", "", "email ผู้ commit คั่นด้วย , (ค่าเริ่มต้น: git config user.email)")
 	depth := flag.Int("depth", 4, "ความลึกสูงสุดที่ค้นหา repo")
-	md := flag.Bool("md", false, "ครอบแต่ละวันด้วย ``` สำหรับ copy")
+	md := flag.Bool("md", false, "ครอบแต่ละวันด้วย code block สำหรับ copy")
 	asMCP := flag.Bool("mcp", false, "รันเป็น MCP server ผ่าน stdio")
+	showVersion := flag.Bool("version", false, "แสดงเวอร์ชันแล้วจบ")
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), `commit-report %s
+สรุป commit ของตัวเองจากทุก git repo ใต้ -root แยกตามวัน และแยกเป็น [ui]/[service]
+
+ตัวอย่าง:
+  commit-report -root D:/Workspace -start 2026-09-14 -end 2026-10-02
+  commit-report -mcp -root D:/Workspace
+
+flags:
+`, version)
+		flag.PrintDefaults()
+	}
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(version)
+		return
+	}
 
 	if *asMCP {
 		if err := serveMCP(*root, *depth); err != nil {
