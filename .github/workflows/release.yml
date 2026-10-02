@@ -1,0 +1,56 @@
+name: release
+
+# PR ถูก merge เข้า main แล้ว ออก release ตาม const version ใน main.go
+# ถ้ามี tag v<version> อยู่แล้ว (ไม่ได้ bump version ใน PR นี้) จะข้าม
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency: release
+
+jobs:
+  release:
+    if: github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    env:
+      SHA: ${{ github.event.pull_request.merge_commit_sha }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+      - name: version
+        id: version
+        run: |
+          version=$(sed -nE 's/^const version = "([0-9]+\.[0-9]+\.[0-9]+)"$/\1/p' main.go)
+          [ -n "$version" ] || { echo "ไม่พบ const version ใน main.go"; exit 1; }
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            echo "มี v$version แล้ว ไม่ออก release (bump const version ใน PR เพื่อออก release ใหม่)"
+          else
+            echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.version.outputs.tag
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - if: steps.version.outputs.tag
+        run: go test ./...
+      - if: steps.version.outputs.tag
+        name: build
+        run: |
+          mkdir dist
+          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
+            os=${target%/*} arch=${target#*/}
+            ext=$([ "$os" = windows ] && echo .exe || true)
+            CGO_ENABLED=0 GOOS=$os GOARCH=$arch go build -trimpath -ldflags "-s -w" \
+              -o "dist/commit-report_${os}_${arch}${ext}" .
+          done
+          cd dist && sha256sum * > checksums.txt
+      # gh release สร้าง tag ที่ merge commit ให้เอง
+      - if: steps.version.outputs.tag
+        run: gh release create "${{ steps.version.outputs.tag }}" dist/* --target "$SHA" --generate-notes
