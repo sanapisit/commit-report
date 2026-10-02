@@ -11,7 +11,7 @@ import (
 )
 
 // bump เลขนี้ใน PR เพื่อออก release ตอน merge เข้า main
-const version = "0.1.0"
+const version = "0.1.1"
 
 type options struct {
 	start, end string
