@@ -50,6 +50,8 @@ go build -o commit-report.exe .
 | `-depth` | `4` | ความลึกสูงสุดที่ค้นหา repo |
 | `-md` | `false` | ครอบแต่ละวันด้วย ```` ``` ```` เพื่อให้ copy ง่าย |
 | `-mcp` | `false` | รันเป็น MCP server ผ่าน stdio |
+| `-version` | `false` | แสดงเวอร์ชันแล้วจบ |
+| `-h` | | แสดงวิธีใช้ |
 
 ## ใช้เป็น MCP server
 
