@@ -23,7 +23,16 @@ func main() {
 	author := flag.String("author", "", "email ผู้ commit คั่นด้วย , (ค่าเริ่มต้น: git config user.email)")
 	depth := flag.Int("depth", 4, "ความลึกสูงสุดที่ค้นหา repo")
 	md := flag.Bool("md", false, "ครอบแต่ละวันด้วย ``` สำหรับ copy")
+	asMCP := flag.Bool("mcp", false, "รันเป็น MCP server ผ่าน stdio")
 	flag.Parse()
+
+	if *asMCP {
+		if err := serveMCP(*root, *depth); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 
 	authors := resolveAuthors(*author)
 	if len(authors) == 0 {
