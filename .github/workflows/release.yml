@@ -1,10 +1,10 @@
 name: release
 
-# PR ถูก merge เข้า main แล้ว ออก release ตาม version ใน Cargo.toml
-# ถ้ามี tag v<version> อยู่แล้ว (ไม่ได้ bump version ใน PR นี้) จะข้าม
+# main รับเฉพาะ merge จาก PR ดังนั้นทุก push เข้า main คือการ merge
+# ออก release ตาม version ใน Cargo.toml ถ้ามี tag v<version> อยู่แล้ว (ไม่ได้ bump version) จะข้าม
+# ใช้ push แทน pull_request: closed เพราะ PR จาก fork ได้ token แบบอ่านอย่างเดียว สร้าง release ไม่ได้
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches: [main]
 
 permissions:
@@ -13,11 +13,10 @@ permissions:
 concurrency: release
 
 env:
-  SHA: ${{ github.event.pull_request.merge_commit_sha }}
+  SHA: ${{ github.sha }}
 
 jobs:
   version:
-    if: github.event.pull_request.merged
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.version.outputs.tag }}
@@ -42,7 +41,7 @@ jobs:
     if: needs.version.outputs.tag
     uses: ./.github/workflows/build.yml
     with:
-      ref: ${{ github.event.pull_request.merge_commit_sha }}
+      ref: ${{ github.sha }}
 
   release:
     needs: [version, build]
