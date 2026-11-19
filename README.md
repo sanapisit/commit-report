@@ -14,26 +14,27 @@
 
 ต้องมี `git` อยู่ใน PATH
 
-ดาวน์โหลด binary ตาม OS ได้จาก [Releases](https://github.com/sanapisit/commit-report/releases) หรือติดตั้งด้วย Go 1.25 ขึ้นไป
+ดาวน์โหลด binary ตาม OS ได้จาก [Releases](https://github.com/sanapisit/commit-report/releases) หรือติดตั้งด้วย Rust 1.85 ขึ้นไป (ได้ binary ไว้ที่ `~/.cargo/bin`)
 
 ```bash
-go install github.com/sanapisit/commit-report@latest
+cargo install --git https://github.com/sanapisit/commit-report
 ```
 
-หรือ build เอง
+ระบุเวอร์ชันได้ด้วย `--tag v0.2.0` หรือ build เอง
 
 ```bash
-go build -o commit-report.exe .
+cargo build --release   # ได้ target/release/commit-report.exe
 ```
 
 ## โครงสร้าง
 
 | ไฟล์ | หน้าที่ |
 |---|---|
-| `main.go` | อ่าน flag และเรียกใช้งาน |
-| `mcp.go` | MCP server และ tool `commit_report` |
-| `git.go` | ค้นหา repo, รัน `git log`, กรองและแปลง commit |
-| `report.go` | จัดกลุ่มตามวัน/ประเภท และ render ผลลัพธ์ |
+| `src/main.rs` | จุดเริ่มต้น เรียกใช้งานตาม flag |
+| `src/cli.rs` | อ่าน flag (รับทั้ง `-root`, `--root`, `-root=x` แบบ Go) |
+| `src/mcp.rs` | MCP server (JSON-RPC ผ่าน stdio) และ tool `commit_report` |
+| `src/git.rs` | ค้นหา repo, รัน `git log`, กรองและแปลง commit |
+| `src/report.rs` | จัดกลุ่มตามวัน/ประเภท และ render ผลลัพธ์ |
 
 ## วิธีใช้
 
@@ -69,7 +70,7 @@ claude mcp add commit-report -- commit-report -mcp -root D:/Workspace
 
 ไม่ต้อง `claude mcp add` ใหม่ แค่เปลี่ยน binary
 
-1. ติดตั้งเวอร์ชันใหม่ด้วย `go install github.com/sanapisit/commit-report@latest` หรือดาวน์โหลดจาก [Releases](https://github.com/sanapisit/commit-report/releases) มาทับไฟล์เดิม (บน Windows ต้องปิด Claude Code หรือ disconnect server ใน `/mcp` ก่อน ไม่งั้นทับไฟล์ไม่ได้)
+1. ติดตั้งเวอร์ชันใหม่ด้วย `cargo install --git https://github.com/sanapisit/commit-report --force` หรือดาวน์โหลดจาก [Releases](https://github.com/sanapisit/commit-report/releases) มาทับไฟล์เดิม (บน Windows ต้องปิด Claude Code หรือ disconnect server ใน `/mcp` ก่อน ไม่งั้นทับไฟล์ไม่ได้)
 2. เปิด session ใหม่ หรือ reconnect `commit-report` ใน `/mcp`
 3. เช็กด้วย `commit-report -version` หรือดูเลขเวอร์ชันใน `/mcp`
 
@@ -85,17 +86,17 @@ claude mcp add commit-report -- commit-report -mcp -root D:/Workspace
 
 ## Release
 
-version อยู่ที่ `const version` ใน `main.go`
+version อยู่ที่ `version` ใน `Cargo.toml`
 
-เมื่อ PR ถูก merge เข้า `main` GitHub Actions จะอ่าน `const version`
+เมื่อ PR ถูก merge เข้า `main` GitHub Actions จะอ่าน `version`
 
 - ถ้ายังไม่มี tag `v<version>` จะรัน test, build binary สำหรับ linux/darwin/windows (amd64, arm64) พร้อม `checksums.txt` แล้วสร้าง tag + release ที่ merge commit
-- ถ้ามี tag นี้อยู่แล้วจะข้าม ดังนั้น PR ที่ไม่ได้แก้ `const version` จะไม่ออก release
+- ถ้ามี tag นี้อยู่แล้วจะข้าม ดังนั้น PR ที่ไม่ได้แก้ `version` จะไม่ออก release
 
-อยากออก release ก็แค่ bump `const version` ใน PR นั้น
+อยากออก release ก็แค่ bump `version` ใน `Cargo.toml` ใน PR นั้น (แล้วรัน `cargo build` ให้ `Cargo.lock` อัปเดตด้วย เพราะ CI build แบบ `--locked`)
 
 ## Test
 
 ```bash
-go test .
+cargo test
 ```
