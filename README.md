@@ -88,6 +88,8 @@ claude mcp add commit-report -- commit-report -mcp -root D:/Workspace
 
 version อยู่ที่ `version` ใน `Cargo.toml`
 
+ทุก PR จะรัน `cargo fmt --check`, `clippy`, test และ build binary ครบทุก target แบบเดียวกับตอน release (`.github/workflows/build.yml`) ถ้าเขียวก็มั่นใจได้ว่า merge แล้ว release จะผ่าน
+
 เมื่อ PR ถูก merge เข้า `main` GitHub Actions จะอ่าน `version`
 
 - ถ้ายังไม่มี tag `v<version>` จะรัน test, build binary สำหรับ linux/darwin/windows (amd64, arm64) พร้อม `checksums.txt` แล้วสร้าง tag + release ที่ merge commit
