@@ -1,0 +1,16 @@
+name: ci
+
+# ทุก PR: test และ build ทุก target แบบเดียวกับตอน release เพื่อเจอปัญหาก่อน merge
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
